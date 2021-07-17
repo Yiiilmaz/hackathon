@@ -1,10 +1,3 @@
-#read unconnected towns
-#read internet nodes
-#construct relationship matrix
-#populate relationship matrix
-#do a minimal spanning tree
-#produce a list of connections
-
 import numpy as np
 import matplotlib.pyplot as plt
 import csv
@@ -66,13 +59,10 @@ def KruskalMST(G, size):
                 edge_list.append({'i' : i, 'j' : j, 'w' : G[i][j]})
     
     edge_list.sort(key=get_weight)
-    print(edge_list)
     for edge in edge_list:
         
         
         MST = add_edge(MST, edge)
-        print(MST)
-        print(isCyclic(MST, size))
         num_edges += 1
         #if theres a cycle drop the edge
         if isCyclic(MST, size):
@@ -132,12 +122,8 @@ for town1 in towns:
                 m[town1['index']][town2['index']] = 0
                 m[town2['index']][town1['index']] = 0
     
-#print(m)
 MST = KruskalMST(m, index)
-print(MST)
 
-xs = []
-ys = []
 for i in range(index):
     for j in range(i, index):
         if adjacent(MST, i, j, index) and MST[i][j] != 0:
