@@ -15,29 +15,51 @@ def find_distance(town1, town2):
 def get_weight(edge):
     return edge['w']
 
-def hasCycle(m, index):
-    visited = [0] * index
-    for v in range(index):
-        for u in range(index):
-            visited[u] = -1
-        if (dfsCycleCheck(m, index, v, v, visited)):
-            return True
-    return False
+def isCyclicUtil(graph, v, visited, parent, size):
 
-
-def dfsCycleCheck(m, index, v, u, visited):
-    visited[v] = False
-    for w in range(index):
-        if ( m[v][w] == 0): # Most likely wrong
-                if not visited[w]:
-                    if dfsCycleCheck(index, v, u, visited):
-                        return True
-                elif (w != u):
+    # Mark the current node as visited
+    visited[v]= True
+    print(graph)
+    # Recur for all the vertices
+    # adjacent to this vertex
+    for i in range(size):
+        if (graph[v][i] != -1):
+            # If the node is not
+            # visited then recurse on it
+            if visited[i]==False :
+                if(isCyclicUtil(graph,i,visited,v,size)):
                     return True
+            # If an adjacent vertex is
+            # visited and not parent
+            # of current vertex,
+            # then there is a cycle
+            elif  parent!=i:
+                return True
+     
     return False
 
-
+def isCyclic(graph, size):
+   
+    # Mark all the vertices
+    # as not visited
+    visited =[False]*(size)
+     
+    # Call the recursive helper
+    # function to detect cycle in different
+    # DFS trees
+    for i in range(1, size):
+        print(visited)
+        # Don't recur for u if it
+        # is already visited
+        if visited[i] == False:
     
+            if(isCyclicUtil(graph,i,visited,0,size)) == True:
+                return True
+     
+    return False
+    
+
+
 def add_edge(G, edge):
     G[edge['i']][edge['j']] = edge['w']
     G[edge['j']][edge['i']] = edge['w']
@@ -52,14 +74,19 @@ def KruskalMST(G, size):
     num_edges = 0
     for i in range(size):
         for j in range(i, size):
-            edge_list.append({'i' : i, 'j' : j, 'w' : G[i][j]})
+            if G[i][j] != -1:
+                edge_list.append({'i' : i, 'j' : j, 'w' : G[i][j]})
+    
     edge_list.sort(key=get_weight)
+    
     for edge in edge_list:
         MST = add_edge(MST, edge)
+        print(isCyclic(MST, size))
         num_edges += 1
         #if theres a cycle drop the edge
-        if hasCycle(MST, size):
+        if isCyclic(MST, size):
             num_edges -= 1
+            
             edge['w'] = -1
             MST = add_edge(MST, edge)
         if num_edges == size - 1:
@@ -114,6 +141,7 @@ for town1 in towns:
                 m[town1['index']][town2['index']] = 0
                 m[town2['index']][town1['index']] = 0
     
+
 MST = KruskalMST(m, index)
 print(MST)
     
